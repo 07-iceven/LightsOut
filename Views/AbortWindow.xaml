@@ -1,0 +1,26 @@
+<Window x:Class="LightsOut.Views.AbortWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        Title="取消关机" 
+        Height="60" Width="160"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False">
+
+    <Grid>
+        <Button Style="{StaticResource AccentButtonStyle}"
+                Content="取消关机"
+                FontSize="18"
+                FontWeight="SemiBold"
+                Padding="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ui:ControlHelper.CornerRadius="30"
+                Click="Abort_Click">
+        </Button>
+    </Grid>
+</Window>
