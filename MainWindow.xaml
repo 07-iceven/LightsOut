@@ -23,14 +23,10 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+        <StackPanel Grid.Row="0" Margin="0,8,0,16">
             <TextBlock Text="LightsOut" 
                        FontSize="28" 
                        FontWeight="Bold" 
-                       HorizontalAlignment="Center"/>
-            <TextBlock Text="自动关机工具" 
-                       FontSize="14" 
-                       Opacity="0.6"
                        HorizontalAlignment="Center"/>
         </StackPanel>
 
@@ -75,21 +71,15 @@
         <!-- Multi-Time List -->
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="计划关机时间列表" 
-                       FontSize="14" 
-                       FontWeight="Medium"
-                       Margin="0,0,0,8"/>
-
-            <ListBox Grid.Row="1" 
+            <ListBox Grid.Row="0" 
                      ItemsSource="{Binding ShutdownTimes}"
                      Background="Transparent"
                      BorderThickness="0"
-                     Padding="0,4"
+                     Padding="0"
                      HorizontalContentAlignment="Stretch"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemContainerStyle>
@@ -156,7 +146,7 @@
             </ListBox>
 
             <!-- Add New Time -->
-            <Border Grid.Row="2" 
+            <Border Grid.Row="1" 
                     Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
                     CornerRadius="8"
                     Padding="12"

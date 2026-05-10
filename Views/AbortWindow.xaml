@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         Title="取消关机" 
-        Height="60" Width="160"
+        Width="188"
+        Height="76"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Topmost="True"
         WindowStyle="None"
@@ -11,16 +13,76 @@
         Background="Transparent"
         ShowInTaskbar="False">
 
-    <Grid>
-        <Button Style="{StaticResource AccentButtonStyle}"
+    <Window.Resources>
+        <Style x:Key="AbortButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#4DB3FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="34">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="18"
+                                                  Direction="270"
+                                                  Opacity="0.22"
+                                                  ShadowDepth="6"
+                                                  Color="#33000000"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ui:SymbolIcon Symbol="Cancel"
+                                               Width="16"
+                                               Height="16"
+                                               Margin="0,0,10,0"
+                                               Foreground="{TemplateBinding Foreground}"
+                                               VerticalAlignment="Center"/>
+                                <ContentPresenter Grid.Column="1"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1384DE"/>
+                                <Setter TargetName="ButtonBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#006CBE"/>
+                                <Setter TargetName="ButtonBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="8">
+        <Button Style="{StaticResource AbortButtonStyle}"
                 Content="取消关机"
-                FontSize="18"
-                FontWeight="SemiBold"
-                Padding="0"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                ui:ControlHelper.CornerRadius="30"
-                Click="Abort_Click">
-        </Button>
+                Click="Abort_Click"/>
     </Grid>
 </Window>
