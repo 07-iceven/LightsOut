@@ -145,3 +145,8 @@ StyleCopReport.xml
 
 # Others
 settings.json
+
+# Publish and installer outputs
+publish/
+Output/
+Output/LightsOut-Setup.exe
