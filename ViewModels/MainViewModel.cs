@@ -22,12 +22,13 @@ namespace LightsOut.ViewModels
     {
         private System.Timers.Timer _timer;
         private DateTime? _nextShutdownDateTime;
+        private bool _isLoadingSettings;
 
         [ObservableProperty]
         private bool _isActive;
 
         [ObservableProperty]
-        private string _countdownText = "未开启";
+        private string _countdownText = string.Empty;
 
         [ObservableProperty]
         private bool _isStartupEnabled;
@@ -41,11 +42,26 @@ namespace LightsOut.ViewModels
         [ObservableProperty]
         private int _newMinute = DateTime.Now.Minute;
 
+        [ObservableProperty]
+        private string _selectedLanguage = LocalizationManager.Instance.CurrentLanguageCode;
+
+        public ObservableCollection<LanguageOption> AvailableLanguages { get; } = new()
+        {
+            new LanguageOption { Code = "zh-CN", DisplayName = "简体中文" },
+            new LanguageOption { Code = "ja", DisplayName = "日本語" },
+            new LanguageOption { Code = "en", DisplayName = "English" }
+        };
+
         public MainViewModel()
         {
             _timer = new System.Timers.Timer(1000);
             _timer.Elapsed += OnTimerElapsed;
             _timer.AutoReset = true;
+
+            LocalizationManager.Instance.LanguageChanged += (_, _) =>
+            {
+                UpdateCountdown();
+            };
 
             ShutdownTimes.CollectionChanged += OnShutdownTimesCollectionChanged;
 
@@ -85,8 +101,12 @@ namespace LightsOut.ViewModels
 
         private void LoadSettings()
         {
+            _isLoadingSettings = true;
             var settings = SettingsService.Load();
             IsActive = settings.IsActive;
+            SelectedLanguage = string.IsNullOrWhiteSpace(settings.Language)
+                ? LocalizationManager.Instance.CurrentLanguageCode
+                : settings.Language;
             
             // 清空并重新填充，以触发 CollectionChanged
             ShutdownTimes.Clear();
@@ -105,6 +125,9 @@ namespace LightsOut.ViewModels
                 UpdateNextShutdownTime();
                 _timer.Start();
             }
+
+            _isLoadingSettings = false;
+            UpdateCountdown();
         }
 
         private void SaveSettings()
@@ -113,7 +136,8 @@ namespace LightsOut.ViewModels
             {
                 IsActive = IsActive,
                 ShutdownTimes = ShutdownTimes.ToList(),
-                IsStartupEnabled = IsStartupEnabled
+                IsStartupEnabled = IsStartupEnabled,
+                Language = SelectedLanguage
             });
         }
 
@@ -129,10 +153,26 @@ namespace LightsOut.ViewModels
             {
                 _timer.Stop();
                 CancelSystemShutdown();
-                CountdownText = "未开启";
+                CountdownText = LocalizationManager.Instance["StatusInactive"];
                 Debug.WriteLine("[LightsOut] 任务已手动关闭");
             }
             SaveSettings();
+        }
+
+        partial void OnSelectedLanguageChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            LocalizationManager.Instance.SetLanguage(value);
+            UpdateCountdown();
+
+            if (!_isLoadingSettings)
+            {
+                SaveSettings();
+            }
         }
 
         [RelayCommand]
@@ -194,7 +234,9 @@ namespace LightsOut.ViewModels
                 UpdateNextShutdownTime();
                 if (_nextShutdownDateTime == null)
                 {
-                    CountdownText = IsActive ? "请添加并开启时间点" : "未开启";
+                    CountdownText = IsActive
+                        ? LocalizationManager.Instance["StatusNoEnabledTimes"]
+                        : LocalizationManager.Instance["StatusInactive"];
                     return;
                 }
             }
@@ -216,7 +258,11 @@ namespace LightsOut.ViewModels
                 return;
             }
 
-            CountdownText = $"下次关机: {remaining.Hours:D2}时 {remaining.Minutes:D2}分 {remaining.Seconds:D2}秒";
+            CountdownText = LocalizationManager.Instance.Format(
+                "CountdownFormat",
+                remaining.Hours,
+                remaining.Minutes,
+                remaining.Seconds);
         }
 
         private void CancelSystemShutdown()

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>LightsOut</value>
+  </data>
+  <data name="MainToggleLabel" xml:space="preserve">
+    <value>自動シャットダウンを有効にする</value>
+  </data>
+  <data name="StatusInactive" xml:space="preserve">
+    <value>オフ</value>
+  </data>
+  <data name="StatusNoEnabledTimes" xml:space="preserve">
+    <value>少なくとも1つの時刻を追加して有効にしてください</value>
+  </data>
+  <data name="CountdownFormat" xml:space="preserve">
+    <value>次回シャットダウン: {0:D2}時 {1:D2}分 {2:D2}秒</value>
+  </data>
+  <data name="HourLabel" xml:space="preserve">
+    <value>時</value>
+  </data>
+  <data name="MinuteLabel" xml:space="preserve">
+    <value>分</value>
+  </data>
+  <data name="AddButton" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="StartupLabel" xml:space="preserve">
+    <value>スタートアップで起動</value>
+  </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>言語</value>
+  </data>
+  <data name="AbortWindowTitle" xml:space="preserve">
+    <value>シャットダウンを取り消す</value>
+  </data>
+  <data name="AbortButtonLabel" xml:space="preserve">
+    <value>シャットダウンを取り消す</value>
+  </data>
+  <data name="TrayToolTip" xml:space="preserve">
+    <value>LightsOut - 自動シャットダウンツール</value>
+  </data>
+  <data name="TrayShowMainWindow" xml:space="preserve">
+    <value>メイン画面を表示</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>完全に終了</value>
+  </data>
+  <data name="TrayMinimizedTitle" xml:space="preserve">
+    <value>LightsOut</value>
+  </data>
+  <data name="TrayMinimizedMessage" xml:space="preserve">
+    <value>アプリはトレイに最小化され、スケジュールされたタスクを継続します</value>
+  </data>
+</root>

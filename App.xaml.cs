@@ -1,6 +1,5 @@
-﻿using System.Configuration;
-using System.Data;
 using System.Windows;
+using LightsOut.Helpers;
 
 namespace LightsOut;
 
@@ -9,5 +8,9 @@ namespace LightsOut;
 /// </summary>
 public partial class App : Application
 {
+    public App()
+    {
+        LocalizationManager.Initialize(SettingsService.Load().Language);
+    }
 }
 

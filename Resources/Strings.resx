@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>LightsOut</value>
+  </data>
+  <data name="MainToggleLabel" xml:space="preserve">
+    <value>Enable auto shutdown</value>
+  </data>
+  <data name="StatusInactive" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="StatusNoEnabledTimes" xml:space="preserve">
+    <value>Please add and enable at least one shutdown time</value>
+  </data>
+  <data name="CountdownFormat" xml:space="preserve">
+    <value>Next shutdown: {0:D2}h {1:D2}m {2:D2}s</value>
+  </data>
+  <data name="HourLabel" xml:space="preserve">
+    <value>Hour</value>
+  </data>
+  <data name="MinuteLabel" xml:space="preserve">
+    <value>Minute</value>
+  </data>
+  <data name="AddButton" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="StartupLabel" xml:space="preserve">
+    <value>Launch At Startup</value>
+  </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="AbortWindowTitle" xml:space="preserve">
+    <value>Cancel Shutdown</value>
+  </data>
+  <data name="AbortButtonLabel" xml:space="preserve">
+    <value>Cancel Shutdown</value>
+  </data>
+  <data name="TrayToolTip" xml:space="preserve">
+    <value>LightsOut - Auto Shutdown Tool</value>
+  </data>
+  <data name="TrayShowMainWindow" xml:space="preserve">
+    <value>Show Main Window</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Exit completely</value>
+  </data>
+  <data name="TrayMinimizedTitle" xml:space="preserve">
+    <value>LightsOut</value>
+  </data>
+  <data name="TrayMinimizedMessage" xml:space="preserve">
+    <value>The app is minimized to the tray and will continue running scheduled tasks.</value>
+  </data>
+</root>

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using Hardcodet.Wpf.TaskbarNotification;
 using System.Windows.Controls;
 using System.Linq;
+using LightsOut.Helpers;
 
 namespace LightsOut;
 
@@ -16,6 +17,8 @@ public partial class MainWindow : Window
     public MainViewModel ViewModel { get; }
     private TaskbarIcon? _taskbarIcon;
     private bool _isExplicitExit = false;
+    private MenuItem? _showItem;
+    private MenuItem? _exitItem;
 
     public MainWindow()
     {
@@ -23,6 +26,8 @@ public partial class MainWindow : Window
         DataContext = ViewModel;
         InitializeComponent();
         InitializeTrayIcon();
+        LocalizationManager.Instance.LanguageChanged += (_, _) => RefreshLocalizedUi();
+        RefreshLocalizedUi();
 
         // 注册消息接收
         WeakReferenceMessenger.Default.Register<ShutdownWarningMessage>(this, (r, m) =>
@@ -45,27 +50,44 @@ public partial class MainWindow : Window
         _taskbarIcon = new TaskbarIcon();
         // 设置托盘图标（这里先使用系统默认图标，实际开发建议准备一个ico资源）
         _taskbarIcon.Icon = System.Drawing.SystemIcons.Application;
-        _taskbarIcon.ToolTipText = "LightsOut - 自动关机工具";
         
         // 双击托盘图标显示窗口
         _taskbarIcon.TrayMouseDoubleClick += (s, e) => ShowWindow();
 
         // 右键菜单
         var contextMenu = new ContextMenu();
-        var showItem = new MenuItem { Header = "显示主界面" };
-        showItem.Click += (s, e) => ShowWindow();
+        _showItem = new MenuItem();
+        _showItem.Click += (s, e) => ShowWindow();
         
-        var exitItem = new MenuItem { Header = "完全退出" };
-        exitItem.Click += (s, e) => 
+        _exitItem = new MenuItem();
+        _exitItem.Click += (s, e) => 
         {
             _isExplicitExit = true;
             Application.Current.Shutdown();
         };
 
-        contextMenu.Items.Add(showItem);
+        contextMenu.Items.Add(_showItem);
         contextMenu.Items.Add(new Separator());
-        contextMenu.Items.Add(exitItem);
+        contextMenu.Items.Add(_exitItem);
         _taskbarIcon.ContextMenu = contextMenu;
+    }
+
+    private void RefreshLocalizedUi()
+    {
+        if (_taskbarIcon != null)
+        {
+            _taskbarIcon.ToolTipText = LocalizationManager.Instance["TrayToolTip"];
+        }
+
+        if (_showItem != null)
+        {
+            _showItem.Header = LocalizationManager.Instance["TrayShowMainWindow"];
+        }
+
+        if (_exitItem != null)
+        {
+            _exitItem.Header = LocalizationManager.Instance["TrayExit"];
+        }
     }
 
     private void ShowWindow()
@@ -81,7 +103,10 @@ public partial class MainWindow : Window
         {
             e.Cancel = true;
             this.Hide(); // 隐藏窗口而非退出
-            _taskbarIcon?.ShowBalloonTip("LightsOut", "程序已最小化到托盘，将继续运行计划任务", BalloonIcon.Info);
+            _taskbarIcon?.ShowBalloonTip(
+                LocalizationManager.Instance["TrayMinimizedTitle"],
+                LocalizationManager.Instance["TrayMinimizedMessage"],
+                BalloonIcon.Info);
         }
         base.OnClosing(e);
     }

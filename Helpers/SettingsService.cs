@@ -17,6 +17,9 @@ namespace LightsOut.Helpers
 
         [JsonPropertyName("is_startup_enabled")]
         public bool IsStartupEnabled { get; set; }
+
+        [JsonPropertyName("language")]
+        public string? Language { get; set; }
     }
 
     public static class SettingsService
