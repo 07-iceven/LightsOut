@@ -8,9 +8,12 @@ namespace LightsOut;
 /// </summary>
 public partial class App : Application
 {
+    public AppSettings StartupSettings { get; }
+
     public App()
     {
-        LocalizationManager.Initialize(SettingsService.Load().Language);
+        StartupSettings = SettingsService.Load();
+        LocalizationManager.Initialize(StartupSettings.Language);
     }
 }
 

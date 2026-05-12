@@ -22,54 +22,67 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
-        ViewModel = new MainViewModel();
+        var startupSettings = (Application.Current as App)?.StartupSettings ?? SettingsService.Load();
+        ViewModel = new MainViewModel(startupSettings);
         DataContext = ViewModel;
         InitializeComponent();
         InitializeTrayIcon();
-        LocalizationManager.Instance.LanguageChanged += (_, _) => RefreshLocalizedUi();
+        LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
         RefreshLocalizedUi();
 
-        // 注册消息接收
-        WeakReferenceMessenger.Default.Register<ShutdownWarningMessage>(this, (r, m) =>
-        {
-            Debug.WriteLine("[LightsOut] MainWindow 接收到关机预警消息");
-            Dispatcher.BeginInvoke(new Action(() => ShowAbortDialog()));
-        });
-        
+        WeakReferenceMessenger.Default.Register<ShutdownWarningMessage>(this, OnShutdownWarningReceived);
         Debug.WriteLine("[LightsOut] MainWindow 已启动并注册消息监听");
 
-        // 检查启动参数
         if (Environment.GetCommandLineArgs().Contains("--minimized"))
         {
-            this.Hide();
+            Hide();
         }
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        RefreshLocalizedUi();
+    }
+
+    private void OnShutdownWarningReceived(object recipient, ShutdownWarningMessage message)
+    {
+        Debug.WriteLine("[LightsOut] MainWindow 接收到关机预警消息");
+        Dispatcher.BeginInvoke(new Action(ShowAbortDialog));
     }
 
     private void InitializeTrayIcon()
     {
         _taskbarIcon = new TaskbarIcon();
-        // 设置托盘图标（这里先使用系统默认图标，实际开发建议准备一个ico资源）
         _taskbarIcon.Icon = System.Drawing.SystemIcons.Application;
-        
-        // 双击托盘图标显示窗口
-        _taskbarIcon.TrayMouseDoubleClick += (s, e) => ShowWindow();
+        _taskbarIcon.TrayMouseDoubleClick += OnTrayMouseDoubleClick;
 
-        // 右键菜单
         var contextMenu = new ContextMenu();
         _showItem = new MenuItem();
-        _showItem.Click += (s, e) => ShowWindow();
+        _showItem.Click += OnShowMenuItemClick;
         
         _exitItem = new MenuItem();
-        _exitItem.Click += (s, e) => 
-        {
-            _isExplicitExit = true;
-            Application.Current.Shutdown();
-        };
+        _exitItem.Click += OnExitMenuItemClick;
 
         contextMenu.Items.Add(_showItem);
         contextMenu.Items.Add(new Separator());
         contextMenu.Items.Add(_exitItem);
         _taskbarIcon.ContextMenu = contextMenu;
+    }
+
+    private void OnTrayMouseDoubleClick(object sender, RoutedEventArgs e)
+    {
+        ShowWindow();
+    }
+
+    private void OnShowMenuItemClick(object sender, RoutedEventArgs e)
+    {
+        ShowWindow();
+    }
+
+    private void OnExitMenuItemClick(object sender, RoutedEventArgs e)
+    {
+        _isExplicitExit = true;
+        Application.Current.Shutdown();
     }
 
     private void RefreshLocalizedUi()
@@ -92,9 +105,9 @@ public partial class MainWindow : Window
 
     private void ShowWindow()
     {
-        this.Show();
-        this.WindowState = WindowState.Normal;
-        this.Activate();
+        Show();
+        WindowState = WindowState.Normal;
+        Activate();
     }
 
     protected override void OnClosing(CancelEventArgs e)
@@ -102,7 +115,7 @@ public partial class MainWindow : Window
         if (!_isExplicitExit)
         {
             e.Cancel = true;
-            this.Hide(); // 隐藏窗口而非退出
+            Hide();
             _taskbarIcon?.ShowBalloonTip(
                 LocalizationManager.Instance["TrayMinimizedTitle"],
                 LocalizationManager.Instance["TrayMinimizedMessage"],
@@ -111,28 +124,54 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 
+    protected override void OnClosed(EventArgs e)
+    {
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        LocalizationManager.Instance.LanguageChanged -= OnLanguageChanged;
+
+        if (_showItem != null)
+        {
+            _showItem.Click -= OnShowMenuItemClick;
+        }
+
+        if (_exitItem != null)
+        {
+            _exitItem.Click -= OnExitMenuItemClick;
+        }
+
+        if (_taskbarIcon != null)
+        {
+            _taskbarIcon.TrayMouseDoubleClick -= OnTrayMouseDoubleClick;
+            _taskbarIcon.Dispose();
+            _taskbarIcon = null;
+        }
+
+        ViewModel.Dispose();
+        base.OnClosed(e);
+    }
+
     private void ShowAbortDialog()
     {
-        try 
+        try
         {
-            // 1. 先下达 Windows 系统级关机指令 (60秒预警)
             Process.Start(new ProcessStartInfo
             {
                 FileName = "shutdown",
-                Arguments = "-s -f -t 60", 
+                Arguments = "-s -f -t 60",
                 CreateNoWindow = true,
                 UseShellExecute = false
             });
             Debug.WriteLine("[LightsOut] 已下达 Windows 系统级关机指令 (-s -f -t 60)");
 
-            // 2. 弹出“取消关机”按钮窗口
-            var abortWin = new AbortWindow(ViewModel);
-            abortWin.Owner = this;
+            var abortWin = new AbortWindow
+            {
+                Owner = this
+            };
             abortWin.ShowDialog();
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[LightsOut] 触发关机流程失败: {ex.Message}");
+            Debug.WriteLine($"[LightsOut] 触发关机流程失败: {ex}");
         }
     }
 }

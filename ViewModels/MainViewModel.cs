@@ -18,11 +18,13 @@ namespace LightsOut.ViewModels
 {
     public class ShutdownWarningMessage { }
 
-    public partial class MainViewModel : ObservableObject
+    public partial class MainViewModel : ObservableObject, IDisposable
     {
         private readonly DispatcherTimer _timer;
+        private readonly DispatcherTimer _saveTimer;
         private DateTime? _nextShutdownDateTime;
         private bool _isLoadingSettings;
+        private bool _isDisposed;
         private bool _isActive;
         private string _countdownText = string.Empty;
         private bool _isStartupEnabled;
@@ -97,29 +99,45 @@ namespace LightsOut.ViewModels
 
         public IRelayCommand<ShutdownTime?> RemoveTimeCommand { get; }
 
-        public MainViewModel()
+        public MainViewModel(AppSettings? initialSettings = null)
         {
             _timer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
-            _timer.Tick += (_, _) => UpdateCountdown();
+            _timer.Tick += OnTimerTick;
+
+            _saveTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(500)
+            };
+            _saveTimer.Tick += OnSaveTimerTick;
 
             AddTimeCommand = new RelayCommand(AddTime);
             RemoveTimeCommand = new RelayCommand<ShutdownTime?>(RemoveTime);
 
-            LocalizationManager.Instance.LanguageChanged += (_, _) =>
-            {
-                UpdateCountdown();
-            };
-
+            LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
             ShutdownTimes.CollectionChanged += OnShutdownTimesCollectionChanged;
 
-            LoadSettings();
+            LoadSettings(initialSettings ?? SettingsService.Load());
             CheckStartupStatus();
-
-            // 初始计算一次，确保倒计时正确
             UpdateNextShutdownTime();
+        }
+
+        private void OnTimerTick(object? sender, EventArgs e)
+        {
+            UpdateCountdown();
+        }
+
+        private void OnSaveTimerTick(object? sender, EventArgs e)
+        {
+            _saveTimer.Stop();
+            SaveSettingsCore();
+        }
+
+        private void OnLanguageChanged(object? sender, EventArgs e)
+        {
+            UpdateCountdown();
         }
 
         private void OnShutdownTimesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -135,37 +153,36 @@ namespace LightsOut.ViewModels
                     item.PropertyChanged += OnShutdownTimePropertyChanged;
             }
             UpdateNextShutdownTime();
-            SaveSettings();
+            QueueSettingsSave();
         }
 
         private void OnShutdownTimePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ShutdownTime.IsEnabled) || 
-                e.PropertyName == nameof(ShutdownTime.Hour) || 
+            if (e.PropertyName == nameof(ShutdownTime.IsEnabled) ||
+                e.PropertyName == nameof(ShutdownTime.Hour) ||
                 e.PropertyName == nameof(ShutdownTime.Minute))
             {
                 UpdateNextShutdownTime();
             }
-            SaveSettings();
+            QueueSettingsSave();
         }
 
-        private void LoadSettings()
+        private void LoadSettings(AppSettings settings)
         {
             _isLoadingSettings = true;
-            var settings = SettingsService.Load();
+
             IsActive = settings.IsActive;
-            IsStartupEnabled = settings.IsStartupEnabled;
+            SetStartupEnabledSilently(settings.IsStartupEnabled);
             SelectedLanguage = string.IsNullOrWhiteSpace(settings.Language)
                 ? LocalizationManager.Instance.CurrentLanguageCode
                 : settings.Language;
-            
-            // 清空并重新填充，以触发 CollectionChanged
+
             ShutdownTimes.Clear();
             foreach (var time in settings.ShutdownTimes)
             {
                 ShutdownTimes.Add(time);
             }
-            
+
             if (IsActive)
             {
                 UpdateNextShutdownTime();
@@ -173,24 +190,50 @@ namespace LightsOut.ViewModels
             }
 
             _isLoadingSettings = false;
-            SaveSettings();
             UpdateCountdown();
         }
 
-        private void SaveSettings()
+        private void QueueSettingsSave()
         {
-            if (_isLoadingSettings)
+            if (_isLoadingSettings || _isDisposed)
             {
                 return;
             }
 
-            SettingsService.Save(new AppSettings
+            _saveTimer.Stop();
+            _saveTimer.Start();
+        }
+
+        private void SaveSettingsCore()
+        {
+            if (_isLoadingSettings || _isDisposed)
+            {
+                return;
+            }
+
+            SettingsService.Save(CreateSettingsSnapshot());
+        }
+
+        private AppSettings CreateSettingsSnapshot()
+        {
+            return new AppSettings
             {
                 IsActive = IsActive,
-                ShutdownTimes = ShutdownTimes.ToList(),
+                ShutdownTimes = ShutdownTimes.Select(CloneShutdownTime).ToList(),
                 IsStartupEnabled = IsStartupEnabled,
                 Language = SelectedLanguage
-            });
+            };
+        }
+
+        private static ShutdownTime CloneShutdownTime(ShutdownTime time)
+        {
+            return new ShutdownTime
+            {
+                Id = time.Id,
+                Hour = time.Hour,
+                Minute = time.Minute,
+                IsEnabled = time.IsEnabled
+            };
         }
 
         private void HandleIsActiveChanged(bool value)
@@ -208,7 +251,8 @@ namespace LightsOut.ViewModels
                 CountdownText = LocalizationManager.Instance["StatusInactive"];
                 Debug.WriteLine("[LightsOut] 任务已手动关闭");
             }
-            SaveSettings();
+
+            QueueSettingsSave();
         }
 
         private void HandleSelectedLanguageChanged(string value)
@@ -220,7 +264,7 @@ namespace LightsOut.ViewModels
 
             LocalizationManager.Instance.SetLanguage(value);
             UpdateCountdown();
-            SaveSettings();
+            QueueSettingsSave();
         }
 
         private void AddTime()
@@ -245,7 +289,7 @@ namespace LightsOut.ViewModels
             }
 
             var now = DateTime.Now;
-            var candidates = new List<DateTime>();
+            List<DateTime> candidates = [];
 
             foreach (var st in ShutdownTimes.Where(t => t.IsEnabled))
             {
@@ -315,13 +359,21 @@ namespace LightsOut.ViewModels
                     UseShellExecute = false
                 });
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[LightsOut] 取消系统关机失败: {ex}");
+            }
         }
 
         private void HandleStartupEnabledChanged(bool value)
         {
-            SetStartup(value);
-            SaveSettings();
+            if (SetStartup(value))
+            {
+                QueueSettingsSave();
+                return;
+            }
+
+            CheckStartupStatus();
         }
 
         private void CheckStartupStatus()
@@ -329,31 +381,76 @@ namespace LightsOut.ViewModels
             try
             {
                 using var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false);
-                IsStartupEnabled = key?.GetValue("LightsOut") != null;
+                SetStartupEnabledSilently(key?.GetValue("LightsOut") != null);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[LightsOut] 检查开机自启状态失败: {ex}");
+            }
         }
 
-        private void SetStartup(bool enable)
+        private void SetStartupEnabledSilently(bool value)
+        {
+            SetProperty(ref _isStartupEnabled, value, nameof(IsStartupEnabled));
+        }
+
+        private bool SetStartup(bool enable)
         {
             try
             {
                 using var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                if (key == null)
+                {
+                    Debug.WriteLine("[LightsOut] 无法打开开机自启注册表项");
+                    return false;
+                }
+
                 if (enable)
                 {
-                    string? path = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
-                    if (path != null)
+                    string? path = Process.GetCurrentProcess().MainModule?.FileName;
+                    if (string.IsNullOrWhiteSpace(path))
                     {
-                        // 添加 --minimized 参数，以便自启动时隐藏到托盘
-                        key?.SetValue("LightsOut", $"\"{path}\" --minimized");
+                        Debug.WriteLine("[LightsOut] 无法获取当前程序路径，未写入开机自启");
+                        return false;
                     }
+
+                    key.SetValue("LightsOut", $"\"{path}\" --minimized");
+                    return true;
                 }
-                else
-                {
-                    key?.DeleteValue("LightsOut", false);
-                }
+
+                key.DeleteValue("LightsOut", false);
+                return true;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[LightsOut] 设置开机自启失败: {ex}");
+                return false;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _timer.Stop();
+            _saveTimer.Stop();
+            SaveSettingsCore();
+            _isDisposed = true;
+
+            _timer.Tick -= OnTimerTick;
+            _saveTimer.Tick -= OnSaveTimerTick;
+            LocalizationManager.Instance.LanguageChanged -= OnLanguageChanged;
+            ShutdownTimes.CollectionChanged -= OnShutdownTimesCollectionChanged;
+
+            foreach (var time in ShutdownTimes)
+            {
+                time.PropertyChanged -= OnShutdownTimePropertyChanged;
+            }
+
+            GC.SuppressFinalize(this);
         }
     }
 }
