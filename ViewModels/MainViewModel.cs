@@ -1,18 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using LightsOut.Helpers;
+using LightsOut.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Timers;
-using Microsoft.Win32;
-using System.Windows;
 using System.Diagnostics;
-using LightsOut.Models;
-using LightsOut.Helpers;
+using System.Linq;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace LightsOut.ViewModels
 {
@@ -20,30 +20,71 @@ namespace LightsOut.ViewModels
 
     public partial class MainViewModel : ObservableObject
     {
-        private System.Timers.Timer _timer;
+        private readonly DispatcherTimer _timer;
         private DateTime? _nextShutdownDateTime;
         private bool _isLoadingSettings;
-
-        [ObservableProperty]
         private bool _isActive;
-
-        [ObservableProperty]
         private string _countdownText = string.Empty;
-
-        [ObservableProperty]
         private bool _isStartupEnabled;
-
-        [ObservableProperty]
-        private ObservableCollection<ShutdownTime> _shutdownTimes = new();
-
-        [ObservableProperty]
         private int _newHour = DateTime.Now.Hour;
-
-        [ObservableProperty]
         private int _newMinute = DateTime.Now.Minute;
-
-        [ObservableProperty]
         private string _selectedLanguage = LocalizationManager.Instance.CurrentLanguageCode;
+
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                if (SetProperty(ref _isActive, value))
+                {
+                    HandleIsActiveChanged(value);
+                }
+            }
+        }
+
+        public string CountdownText
+        {
+            get => _countdownText;
+            private set => SetProperty(ref _countdownText, value);
+        }
+
+        public bool IsStartupEnabled
+        {
+            get => _isStartupEnabled;
+            set
+            {
+                if (SetProperty(ref _isStartupEnabled, value))
+                {
+                    HandleStartupEnabledChanged(value);
+                }
+            }
+        }
+
+        public ObservableCollection<ShutdownTime> ShutdownTimes { get; } = new();
+
+        public int NewHour
+        {
+            get => _newHour;
+            set => SetProperty(ref _newHour, value);
+        }
+
+        public int NewMinute
+        {
+            get => _newMinute;
+            set => SetProperty(ref _newMinute, value);
+        }
+
+        public string SelectedLanguage
+        {
+            get => _selectedLanguage;
+            set
+            {
+                if (SetProperty(ref _selectedLanguage, value))
+                {
+                    HandleSelectedLanguageChanged(value);
+                }
+            }
+        }
 
         public ObservableCollection<LanguageOption> AvailableLanguages { get; } = new()
         {
@@ -52,11 +93,20 @@ namespace LightsOut.ViewModels
             new LanguageOption { Code = "en", DisplayName = "English" }
         };
 
+        public IRelayCommand AddTimeCommand { get; }
+
+        public IRelayCommand<ShutdownTime?> RemoveTimeCommand { get; }
+
         public MainViewModel()
         {
-            _timer = new System.Timers.Timer(1000);
-            _timer.Elapsed += OnTimerElapsed;
-            _timer.AutoReset = true;
+            _timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            _timer.Tick += (_, _) => UpdateCountdown();
+
+            AddTimeCommand = new RelayCommand(AddTime);
+            RemoveTimeCommand = new RelayCommand<ShutdownTime?>(RemoveTime);
 
             LocalizationManager.Instance.LanguageChanged += (_, _) =>
             {
@@ -104,6 +154,7 @@ namespace LightsOut.ViewModels
             _isLoadingSettings = true;
             var settings = SettingsService.Load();
             IsActive = settings.IsActive;
+            IsStartupEnabled = settings.IsStartupEnabled;
             SelectedLanguage = string.IsNullOrWhiteSpace(settings.Language)
                 ? LocalizationManager.Instance.CurrentLanguageCode
                 : settings.Language;
@@ -114,11 +165,6 @@ namespace LightsOut.ViewModels
             {
                 ShutdownTimes.Add(time);
             }
-
-            if (ShutdownTimes.Count == 0)
-            {
-                ShutdownTimes.Add(new ShutdownTime { Hour = 23, Minute = 0 });
-            }
             
             if (IsActive)
             {
@@ -127,11 +173,17 @@ namespace LightsOut.ViewModels
             }
 
             _isLoadingSettings = false;
+            SaveSettings();
             UpdateCountdown();
         }
 
         private void SaveSettings()
         {
+            if (_isLoadingSettings)
+            {
+                return;
+            }
+
             SettingsService.Save(new AppSettings
             {
                 IsActive = IsActive,
@@ -141,7 +193,7 @@ namespace LightsOut.ViewModels
             });
         }
 
-        partial void OnIsActiveChanged(bool value)
+        private void HandleIsActiveChanged(bool value)
         {
             if (value)
             {
@@ -159,7 +211,7 @@ namespace LightsOut.ViewModels
             SaveSettings();
         }
 
-        partial void OnSelectedLanguageChanged(string value)
+        private void HandleSelectedLanguageChanged(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -168,21 +220,15 @@ namespace LightsOut.ViewModels
 
             LocalizationManager.Instance.SetLanguage(value);
             UpdateCountdown();
-
-            if (!_isLoadingSettings)
-            {
-                SaveSettings();
-            }
+            SaveSettings();
         }
 
-        [RelayCommand]
         private void AddTime()
         {
             ShutdownTimes.Add(new ShutdownTime { Hour = NewHour, Minute = NewMinute });
         }
 
-        [RelayCommand]
-        private void RemoveTime(ShutdownTime time)
+        private void RemoveTime(ShutdownTime? time)
         {
             if (time != null)
             {
@@ -222,11 +268,6 @@ namespace LightsOut.ViewModels
             }
         }
 
-        private void OnTimerElapsed(object? sender, ElapsedEventArgs e)
-        {
-            UpdateCountdown();
-        }
-
         private void UpdateCountdown()
         {
             if (_nextShutdownDateTime == null)
@@ -251,10 +292,7 @@ namespace LightsOut.ViewModels
                 // 立即计算下一个时间点
                 UpdateNextShutdownTime();
 
-                Application.Current.Dispatcher.BeginInvoke(new Action(() => 
-                {
-                    WeakReferenceMessenger.Default.Send(new ShutdownWarningMessage());
-                }));
+                WeakReferenceMessenger.Default.Send(new ShutdownWarningMessage());
                 return;
             }
 
@@ -280,7 +318,7 @@ namespace LightsOut.ViewModels
             catch { }
         }
 
-        partial void OnIsStartupEnabledChanged(bool value)
+        private void HandleStartupEnabledChanged(bool value)
         {
             SetStartup(value);
             SaveSettings();

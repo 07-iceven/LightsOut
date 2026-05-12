@@ -4,28 +4,49 @@ using System.Text.Json.Serialization;
 
 namespace LightsOut.Models
 {
-    public partial class ShutdownTime : ObservableObject
+    public class ShutdownTime : ObservableObject
     {
+        private int _hour;
+        private int _minute;
+        private bool _isEnabled = true;
+
         [JsonPropertyName("id")]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        [ObservableProperty]
-        [property: JsonPropertyName("hour")]
-        private int _hour;
+        [JsonPropertyName("hour")]
+        public int Hour
+        {
+            get => _hour;
+            set
+            {
+                if (SetProperty(ref _hour, value))
+                {
+                    OnPropertyChanged(nameof(DisplayTime));
+                }
+            }
+        }
 
-        [ObservableProperty]
-        [property: JsonPropertyName("minute")]
-        private int _minute;
+        [JsonPropertyName("minute")]
+        public int Minute
+        {
+            get => _minute;
+            set
+            {
+                if (SetProperty(ref _minute, value))
+                {
+                    OnPropertyChanged(nameof(DisplayTime));
+                }
+            }
+        }
 
-        [ObservableProperty]
-        [property: JsonPropertyName("is_enabled")]
-        private bool _isEnabled = true;
+        [JsonPropertyName("is_enabled")]
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set => SetProperty(ref _isEnabled, value);
+        }
 
         [JsonIgnore]
         public string DisplayTime => $"{Hour:D2}:{Minute:D2}";
-
-        // 当属性改变时，DisplayTime 也需要更新
-        partial void OnHourChanged(int value) => OnPropertyChanged(nameof(DisplayTime));
-        partial void OnMinuteChanged(int value) => OnPropertyChanged(nameof(DisplayTime));
     }
 }
