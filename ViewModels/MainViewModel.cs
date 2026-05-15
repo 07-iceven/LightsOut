@@ -269,14 +269,14 @@ namespace LightsOut.ViewModels
             {
                 UpdateNextShutdownTime();
                 _timer.Start();
-                Debug.WriteLine($"[LightsOut] 任务已开启");
+                Debug.WriteLine($"[Lights Out] 任务已开启");
             }
             else
             {
                 _timer.Stop();
                 CancelSystemShutdown();
                 CountdownText = LocalizationManager.Instance["StatusInactive"];
-                Debug.WriteLine("[LightsOut] 任务已手动关闭");
+                Debug.WriteLine("[Lights Out] 任务已手动关闭");
             }
 
             QueueSettingsSave();
@@ -356,7 +356,7 @@ namespace LightsOut.ViewModels
             if (candidates.Any())
             {
                 _nextShutdownDateTime = candidates.Min();
-                Debug.WriteLine($"[LightsOut] 下一个关机时间: {_nextShutdownDateTime}");
+                Debug.WriteLine($"[Lights Out] 下一个关机时间: {_nextShutdownDateTime}");
             }
             else
             {
@@ -383,7 +383,7 @@ namespace LightsOut.ViewModels
 
             if (remaining.TotalSeconds <= 0)
             {
-                Debug.WriteLine("[LightsOut] !!! 触发关机预警 !!!");
+                Debug.WriteLine("[Lights Out] !!! 触发关机预警 !!!");
                 
                 // 立即计算下一个时间点
                 UpdateNextShutdownTime();
@@ -413,7 +413,7 @@ namespace LightsOut.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LightsOut] 取消系统关机失败: {ex}");
+                Debug.WriteLine($"[Lights Out] 取消系统关机失败: {ex}");
             }
         }
 
@@ -433,11 +433,11 @@ namespace LightsOut.ViewModels
             try
             {
                 using var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", false);
-                SetStartupEnabledSilently(key?.GetValue("LightsOut") != null);
+                SetStartupEnabledSilently(key?.GetValue("Lights Out") != null);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LightsOut] 检查开机自启状态失败: {ex}");
+                Debug.WriteLine($"[Lights Out] 检查开机自启状态失败: {ex}");
             }
         }
 
@@ -453,7 +453,7 @@ namespace LightsOut.ViewModels
                 using var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
                 if (key == null)
                 {
-                    Debug.WriteLine("[LightsOut] 无法打开开机自启注册表项");
+                    Debug.WriteLine("[Lights Out] 无法打开开机自启注册表项");
                     return false;
                 }
 
@@ -462,20 +462,20 @@ namespace LightsOut.ViewModels
                     string? path = Process.GetCurrentProcess().MainModule?.FileName;
                     if (string.IsNullOrWhiteSpace(path))
                     {
-                        Debug.WriteLine("[LightsOut] 无法获取当前程序路径，未写入开机自启");
+                        Debug.WriteLine("[Lights Out] 无法获取当前程序路径，未写入开机自启");
                         return false;
                     }
 
-                    key.SetValue("LightsOut", $"\"{path}\" --minimized");
+                    key.SetValue("Lights Out", $"\"{path}\" --minimized");
                     return true;
                 }
 
-                key.DeleteValue("LightsOut", false);
+                key.DeleteValue("Lights Out", false);
                 return true;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LightsOut] 设置开机自启失败: {ex}");
+                Debug.WriteLine($"[Lights Out] 设置开机自启失败: {ex}");
                 return false;
             }
         }

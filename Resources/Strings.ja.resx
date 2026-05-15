@@ -13,7 +13,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppTitle" xml:space="preserve">
-    <value>LightsOut</value>
+    <value>Lights Out</value>
   </data>
   <data name="MainToggleLabel" xml:space="preserve">
     <value>自動シャットダウンを有効にする</value>
@@ -49,7 +49,7 @@
     <value>シャットダウンを取り消す</value>
   </data>
   <data name="TrayToolTip" xml:space="preserve">
-    <value>LightsOut - 自動シャットダウンツール</value>
+    <value>Lights Out - 自動シャットダウンツール</value>
   </data>
   <data name="TrayShowMainWindow" xml:space="preserve">
     <value>メイン画面を表示</value>
@@ -58,7 +58,7 @@
     <value>完全に終了</value>
   </data>
   <data name="TrayMinimizedTitle" xml:space="preserve">
-    <value>LightsOut</value>
+    <value>Lights Out</value>
   </data>
   <data name="TrayMinimizedMessage" xml:space="preserve">
     <value>アプリはトレイに最小化され、スケジュールされたタスクを継続します</value>

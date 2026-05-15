@@ -21,7 +21,7 @@ LightsOut 是一款基于 WPF 开发的现代 Windows 定时关机工具。它�
 
 ## 版本
 
-当前版本: **1.0**
+当前版本: **1.1**
 
 ## 如何使用
 
@@ -31,7 +31,7 @@ LightsOut 是一款基于 WPF 开发的现代 Windows 定时关机工具。它�
 ### 安装方式
 
 #### 方式一：使用安装包（推荐）
-1. 下载 `LightsOut-Setup.exe` 安装包
+1. 下载 `LightsOut-Setup-1.1.exe` 安装包
 2. 双击运行安装程序
 3. 按照向导完成安装
 4. 从开始菜单或桌面快捷方式启动
@@ -60,7 +60,8 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishTrimmed=fal
 1. 下载并安装 [Inno Setup](https://jrsoftware.org/isdl.php)
 2. 使用 Inno Setup Compiler 打开 `LightsOut.iss`
 3. 按 `F9` 或点击 Build → Compile 编译
-4. 安装包将生成在 `Output/LightsOut-Setup.exe`
+4. 或使用命令行执行 `ISCC.exe .\LightsOut.iss`
+5. 安装包将生成在 `Output/LightsOut-Setup-1.1.exe`
 
 ## 项目结构
 

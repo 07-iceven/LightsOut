@@ -4,9 +4,8 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:helpers="clr-namespace:LightsOut.Helpers"
         Title="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[AbortWindowTitle]}"
-        MinWidth="240"
-        Height="76"
-        SizeToContent="Width"
+        MinWidth="260"
+        SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Topmost="True"
@@ -16,60 +15,64 @@
         ShowInTaskbar="False">
 
     <Window.Resources>
-        <Style x:Key="AbortButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#0078D4"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#4DB3FF"/>
+        <helpers:ContrastForegroundConverter x:Key="ContrastForegroundConverter"/>
+
+        <DropShadowEffect x:Key="FloatingShadowEffect"
+                          BlurRadius="28"
+                          Direction="270"
+                          Opacity="0.28"
+                          ShadowDepth="10"
+                          Color="#5C000000"/>
+
+        <Style x:Key="AbortButtonStyle" TargetType="{x:Type ui:Button}">
+            <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorOnAccentDefaultBrush}"/>
+            <Setter Property="Foreground"
+                    Value="{Binding RelativeSource={RelativeSource Self}, Path=Background, Converter={StaticResource ContrastForegroundConverter}}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontSize" Value="17"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="Padding" Value="18,12"/>
+            <Setter Property="MinWidth" Value="240"/>
+            <Setter Property="MinHeight" Value="56"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
+                    <ControlTemplate TargetType="{x:Type ui:Button}">
                         <Border x:Name="ButtonBorder"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="34">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="18"
-                                                  Direction="270"
-                                                  Opacity="0.22"
-                                                  ShadowDepth="6"
-                                                  Color="#33000000"/>
-                            </Border.Effect>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ui:SymbolIcon Symbol="Dismiss24"
-                                               Margin="0,0,10,0"
-                                               Foreground="{TemplateBinding Foreground}"
-                                               VerticalAlignment="Center"/>
-                                <ContentPresenter Grid.Column="1"
-                                                  HorizontalAlignment="Center"
-                                                  VerticalAlignment="Center"/>
-                            </Grid>
+                                CornerRadius="28"
+                                Effect="{StaticResource FloatingShadowEffect}"
+                                RenderTransformOrigin="0.5,0.5"
+                                SnapsToDevicePixels="True">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1"/>
+                            </Border.RenderTransform>
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1384DE"/>
+                                <Setter Property="Background" Value="{DynamicResource AccentFillColorSecondaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AccentFillColorTertiaryBrush}"/>
                                 <Setter TargetName="ButtonBorder" Property="RenderTransform">
                                     <Setter.Value>
-                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                        <ScaleTransform ScaleX="0.985" ScaleY="0.985"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#006CBE"/>
-                                <Setter TargetName="ButtonBorder" Property="RenderTransform">
-                                    <Setter.Value>
-                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
-                                    </Setter.Value>
-                                </Setter>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="{DynamicResource AccentFillColorDisabledBrush}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorOnAccentDisabledBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -78,12 +81,33 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="8">
-        <Button Style="{StaticResource AbortButtonStyle}"
-                Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[AbortButtonLabel]}"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Click="Abort_Click"
-                FocusVisualStyle="{x:Null}"/>
+    <Grid Margin="10">
+        <Border Background="{DynamicResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource SurfaceStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="32"
+                Effect="{StaticResource FloatingShadowEffect}">
+            <Border Padding="4">
+                <ui:Button Style="{StaticResource AbortButtonStyle}"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Click="Abort_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="Dismiss24"
+                                       Margin="0,0,10,0"
+                                       Foreground="{Binding RelativeSource={RelativeSource AncestorType={x:Type ui:Button}}, Path=Foreground}"
+                                       VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[AbortButtonLabel]}"
+                                   VerticalAlignment="Center"
+                                   Foreground="{Binding RelativeSource={RelativeSource AncestorType={x:Type ui:Button}}, Path=Foreground}"/>
+                    </Grid>
+                </ui:Button>
+            </Border>
+        </Border>
     </Grid>
 </Window>

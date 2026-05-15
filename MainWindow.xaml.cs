@@ -41,7 +41,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         RefreshLocalizedUi();
 
         WeakReferenceMessenger.Default.Register<ShutdownWarningMessage>(this, OnShutdownWarningReceived);
-        Debug.WriteLine("[LightsOut] MainWindow 已启动并注册消息监听");
+        Debug.WriteLine("[Lights Out] MainWindow 已启动并注册消息监听");
 
         if (Environment.GetCommandLineArgs().Contains("--minimized"))
         {
@@ -56,7 +56,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private void OnShutdownWarningReceived(object recipient, ShutdownWarningMessage message)
     {
-        Debug.WriteLine("[LightsOut] MainWindow 接收到关机预警消息");
+        Debug.WriteLine("[Lights Out] MainWindow 接收到关机预警消息");
         Dispatcher.BeginInvoke(new Action(ShowAbortDialog));
     }
 
@@ -171,7 +171,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
                 CreateNoWindow = true,
                 UseShellExecute = false
             });
-            Debug.WriteLine("[LightsOut] 已下达 Windows 系统级关机指令 (-s -f -t 60)");
+            Debug.WriteLine("[Lights Out] 已下达 Windows 系统级关机指令 (-s -f -t 60)");
 
             var abortWin = new AbortWindow
             {
@@ -181,7 +181,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[LightsOut] 触发关机流程失败: {ex}");
+            Debug.WriteLine($"[Lights Out] 触发关机流程失败: {ex}");
         }
     }
 

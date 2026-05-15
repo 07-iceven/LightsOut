@@ -23,12 +23,12 @@ namespace LightsOut.Views
                     UseShellExecute = false
                 });
 
-                Debug.WriteLine("[LightsOut] 用户点击了取消按钮，已发送 shutdown -a，主开关保持开启状态");
+                Debug.WriteLine("[Lights Out] 用户点击了取消按钮，已发送 shutdown -a，主开关保持开启状态");
                 Close();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LightsOut] 取消关机失败: {ex}");
+                Debug.WriteLine($"[Lights Out] 取消关机失败: {ex}");
                 Close();
             }
         }
