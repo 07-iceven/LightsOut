@@ -9,16 +9,26 @@ using Hardcodet.Wpf.TaskbarNotification;
 using System.Windows.Controls;
 using System.Linq;
 using LightsOut.Helpers;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Controls.Primitives;
 
 namespace LightsOut;
 
 public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {
+    private const double TimeListDragThreshold = 6;
+
     public MainViewModel ViewModel { get; }
     private TaskbarIcon? _taskbarIcon;
     private bool _isExplicitExit = false;
     private MenuItem? _showItem;
     private MenuItem? _exitItem;
+    private ScrollViewer? _timeListScrollViewer;
+    private bool _isTimeListDragPending;
+    private bool _isTimeListDragging;
+    private Point _timeListDragStartPoint;
+    private double _timeListDragStartOffset;
 
     public MainWindow()
     {
@@ -173,5 +183,127 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         {
             Debug.WriteLine($"[LightsOut] 触发关机流程失败: {ex}");
         }
+    }
+
+    private void OnTimeListLoaded(object sender, RoutedEventArgs e)
+    {
+        _timeListScrollViewer = FindDescendant<ScrollViewer>(TimeListBox);
+    }
+
+    private void OnTimeListPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (_timeListScrollViewer == null
+            || e.ChangedButton != MouseButton.Left
+            || e.StylusDevice?.TabletDevice.Type == TabletDeviceType.Touch
+            || IsInteractiveElement(e.OriginalSource))
+        {
+            return;
+        }
+
+        _isTimeListDragPending = true;
+        _isTimeListDragging = false;
+        _timeListDragStartPoint = e.GetPosition(this);
+        _timeListDragStartOffset = _timeListScrollViewer.VerticalOffset;
+    }
+
+    private void OnTimeListPreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_timeListScrollViewer == null || !_isTimeListDragPending || e.LeftButton != MouseButtonState.Pressed)
+        {
+            return;
+        }
+
+        var currentPosition = e.GetPosition(this);
+        var delta = currentPosition.Y - _timeListDragStartPoint.Y;
+
+        if (!_isTimeListDragging)
+        {
+            if (Math.Abs(delta) < TimeListDragThreshold)
+            {
+                return;
+            }
+
+            _isTimeListDragging = true;
+            TimeListBox.CaptureMouse();
+            Mouse.OverrideCursor = Cursors.SizeNS;
+        }
+
+        _timeListScrollViewer.ScrollToVerticalOffset(_timeListDragStartOffset - delta);
+        e.Handled = true;
+    }
+
+    private void OnTimeListPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        EndTimeListDrag();
+    }
+
+    private void OnTimeListLostMouseCapture(object sender, MouseEventArgs e)
+    {
+        EndTimeListDrag();
+    }
+
+    private void EndTimeListDrag()
+    {
+        if (_isTimeListDragging && TimeListBox.IsMouseCaptured)
+        {
+            TimeListBox.ReleaseMouseCapture();
+        }
+
+        _isTimeListDragPending = false;
+        _isTimeListDragging = false;
+
+        if (Mouse.OverrideCursor == Cursors.SizeNS)
+        {
+            Mouse.OverrideCursor = null;
+        }
+    }
+
+    private static bool IsInteractiveElement(object originalSource)
+    {
+        if (originalSource is not DependencyObject dependencyObject)
+        {
+            return false;
+        }
+
+        return FindAncestor<ButtonBase>(dependencyObject) != null
+            || FindAncestor<ToggleButton>(dependencyObject) != null
+            || FindAncestor<TextBoxBase>(dependencyObject) != null
+            || FindAncestor<RepeatButton>(dependencyObject) != null
+            || FindAncestor<ScrollBar>(dependencyObject) != null;
+    }
+
+    private static T? FindDescendant<T>(DependencyObject root) where T : DependencyObject
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is T found)
+            {
+                return found;
+            }
+
+            var descendant = FindDescendant<T>(child);
+            if (descendant != null)
+            {
+                return descendant;
+            }
+        }
+
+        return null;
+    }
+
+    private static T? FindAncestor<T>(DependencyObject? current) where T : DependencyObject
+    {
+        while (current != null)
+        {
+            if (current is T ancestor)
+            {
+                return ancestor;
+            }
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return null;
     }
 }

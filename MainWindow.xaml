@@ -84,13 +84,23 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <ListBox Grid.Row="0" 
+                <ListBox x:Name="TimeListBox"
+                         Grid.Row="0" 
                          ItemsSource="{Binding ShutdownTimes}"
                          Background="Transparent"
                          BorderThickness="0"
                          Padding="0"
                          HorizontalContentAlignment="Stretch"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                         Loaded="OnTimeListLoaded"
+                         PreviewMouseLeftButtonDown="OnTimeListPreviewMouseLeftButtonDown"
+                         PreviewMouseMove="OnTimeListPreviewMouseMove"
+                         PreviewMouseLeftButtonUp="OnTimeListPreviewMouseLeftButtonUp"
+                         LostMouseCapture="OnTimeListLostMouseCapture"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.CanContentScroll="False"
+                         ScrollViewer.PanningMode="VerticalOnly"
+                         ScrollViewer.PanningDeceleration="0.001">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Padding" Value="0"/>
