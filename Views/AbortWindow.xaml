@@ -1,7 +1,7 @@
 <Window x:Class="LightsOut.Views.AbortWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:helpers="clr-namespace:LightsOut.Helpers"
         Title="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[AbortWindowTitle]}"
         MinWidth="240"
@@ -45,9 +45,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ui:SymbolIcon Symbol="Cancel"
-                                               Width="16"
-                                               Height="16"
+                                <ui:SymbolIcon Symbol="Dismiss24"
                                                Margin="0,0,10,0"
                                                Foreground="{TemplateBinding Foreground}"
                                                VerticalAlignment="Center"/>

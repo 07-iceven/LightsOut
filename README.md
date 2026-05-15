@@ -8,7 +8,7 @@ LightsOut 是一款基于 WPF 开发的现代 Windows 定时关机工具。它�
 - **倒计时显示**: 实时显示距离下次关机还剩多少时间。
 - **托盘运行**: 支持最小化到系统托盘，后台静默运行。
 - **开机自启**: 可选跟随系统启动，无需手动开启。
-- **现代 UI**: 采用 ModernWpf 风格，完美契合 Windows 10/11 视觉体验。
+- **现代 UI**: 采用 WPF-UI 风格，完美契合 Windows 11 Fluent Design 视觉体验。
 - **自动保存**: 关机任务和状态设置会自动保存，下次启动自动加载。
 - **多语言支持**: 支持中文、英文、日文三种语言。
 
@@ -16,7 +16,7 @@ LightsOut 是一款基于 WPF 开发的现代 Windows 定时关机工具。它�
 
 - **框架**: .NET 8.0 (WPF)
 - **模式**: MVVM (使用 CommunityToolkit.Mvvm)
-- **UI 库**: ModernWpfUI
+- **UI 库**: WPF-UI
 - **组件**: Hardcodet.NotifyIcon.Wpf (系统托盘支持)
 
 ## 版本

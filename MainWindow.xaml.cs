@@ -12,7 +12,7 @@ using LightsOut.Helpers;
 
 namespace LightsOut;
 
-public partial class MainWindow : Window
+public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {
     public MainViewModel ViewModel { get; }
     private TaskbarIcon? _taskbarIcon;
