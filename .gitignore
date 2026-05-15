@@ -37,6 +37,9 @@ logs/
 # Uncomment if you use Visual Studio Code
 .vscode/
 
+# Trae files
+.trae/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
