@@ -63,4 +63,16 @@
   <data name="TrayMinimizedMessage" xml:space="preserve">
     <value>程序已最小化到托盘，将继续运行计划任务</value>
   </data>
+  <data name="ThemeLabel" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>浅色</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>跟随系统</value>
+  </data>
 </root>

@@ -8,6 +8,13 @@ using LightsOut.Models;
 
 namespace LightsOut.Helpers
 {
+    public enum AppTheme
+    {
+        System,
+        Light,
+        Dark
+    }
+
     public class AppSettings
     {
         [JsonPropertyName("is_active")]
@@ -21,6 +28,9 @@ namespace LightsOut.Helpers
 
         [JsonPropertyName("language")]
         public string? Language { get; set; }
+
+        [JsonPropertyName("theme")]
+        public AppTheme Theme { get; set; } = AppTheme.System;
     }
 
     public static class SettingsService
@@ -98,6 +108,7 @@ namespace LightsOut.Helpers
                 IsActive = settings.IsActive,
                 IsStartupEnabled = settings.IsStartupEnabled,
                 Language = settings.Language,
+                Theme = settings.Theme,
                 ShutdownTimes = settings.ShutdownTimes
                     .Select(time => new ShutdownTime
                     {

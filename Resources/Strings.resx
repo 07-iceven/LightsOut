@@ -63,4 +63,16 @@
   <data name="TrayMinimizedMessage" xml:space="preserve">
     <value>The app is minimized to the tray and will continue running scheduled tasks.</value>
   </data>
+  <data name="ThemeLabel" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
 </root>

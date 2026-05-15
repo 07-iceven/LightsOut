@@ -207,43 +207,60 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <ui:SymbolIcon Symbol="Settings24" Margin="0,0,10,0"/>
-                        <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[StartupLabel]}"
-                                   Margin="0,0,12,0"
-                                   TextWrapping="Wrap"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                    </StackPanel>
-                    <ui:ToggleSwitch Grid.Row="0"
-                                     Grid.Column="1"
-                                     IsChecked="{Binding IsStartupEnabled}" 
-                                     HorizontalAlignment="Right"
-                                     Margin="0"
-                                     Padding="0"
-                                     FocusVisualStyle="{x:Null}"/>
-
-                    <TextBlock Grid.Row="1"
-                               Grid.Column="0"
-                               Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[LanguageLabel]}"
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:SymbolIcon Symbol="Settings24" Margin="0,0,10,0"/>
+                    <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[StartupLabel]}"
+                               Margin="0,0,12,0"
+                               TextWrapping="Wrap"
                                VerticalAlignment="Center"
-                               Margin="0,14,0,0"
                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                    <ComboBox Grid.Row="1"
-                              Grid.Column="1"
-                              MinWidth="120"
-                              Margin="0,10,0,0"
-                              ItemsSource="{Binding AvailableLanguages}"
-                              DisplayMemberPath="DisplayName"
-                              SelectedValuePath="Code"
-                              SelectedValue="{Binding SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              FocusVisualStyle="{x:Null}"/>
-                </Grid>
-            </ui:Card>
+                </StackPanel>
+                <ui:ToggleSwitch Grid.Row="0"
+                                 Grid.Column="1"
+                                 IsChecked="{Binding IsStartupEnabled}" 
+                                 HorizontalAlignment="Right"
+                                 Margin="0"
+                                 Padding="0"
+                                 FocusVisualStyle="{x:Null}"/>
+
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[LanguageLabel]}"
+                           VerticalAlignment="Center"
+                           Margin="0,14,0,0"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <ComboBox Grid.Row="1"
+                          Grid.Column="1"
+                          MinWidth="120"
+                          Margin="0,10,0,0"
+                          ItemsSource="{Binding AvailableLanguages}"
+                          DisplayMemberPath="DisplayName"
+                          SelectedValuePath="Code"
+                          SelectedValue="{Binding SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          FocusVisualStyle="{x:Null}"/>
+
+                <TextBlock Grid.Row="2"
+                           Grid.Column="0"
+                           Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[ThemeLabel]}"
+                           VerticalAlignment="Center"
+                           Margin="0,14,0,0"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <ComboBox Grid.Row="2"
+                          Grid.Column="1"
+                          MinWidth="120"
+                          Margin="0,10,0,0"
+                          ItemsSource="{Binding AvailableThemes}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Value"
+                          SelectedValue="{Binding SelectedTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          FocusVisualStyle="{x:Null}"/>
+            </Grid>
+        </ui:Card>
         </Grid>
     </Grid>
 </ui:FluentWindow>

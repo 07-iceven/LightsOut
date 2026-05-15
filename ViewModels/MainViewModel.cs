@@ -31,6 +31,7 @@ namespace LightsOut.ViewModels
         private int _newHour = DateTime.Now.Hour;
         private int _newMinute = DateTime.Now.Minute;
         private string _selectedLanguage = LocalizationManager.Instance.CurrentLanguageCode;
+        private AppTheme _selectedTheme;
 
         public bool IsActive
         {
@@ -88,12 +89,26 @@ namespace LightsOut.ViewModels
             }
         }
 
+        public AppTheme SelectedTheme
+        {
+            get => _selectedTheme;
+            set
+            {
+                if (SetProperty(ref _selectedTheme, value))
+                {
+                    HandleSelectedThemeChanged(value);
+                }
+            }
+        }
+
         public ObservableCollection<LanguageOption> AvailableLanguages { get; } = new()
         {
             new LanguageOption { Code = "zh-CN", DisplayName = "简体中文" },
             new LanguageOption { Code = "ja", DisplayName = "日本語" },
             new LanguageOption { Code = "en", DisplayName = "English" }
         };
+
+        public ObservableCollection<ThemeOption> AvailableThemes { get; } = new();
 
         public IRelayCommand AddTimeCommand { get; }
 
@@ -119,9 +134,18 @@ namespace LightsOut.ViewModels
             LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
             ShutdownTimes.CollectionChanged += OnShutdownTimesCollectionChanged;
 
+            UpdateAvailableThemes();
             LoadSettings(initialSettings ?? SettingsService.Load());
             CheckStartupStatus();
             UpdateNextShutdownTime();
+        }
+
+        private void UpdateAvailableThemes()
+        {
+            AvailableThemes.Clear();
+            AvailableThemes.Add(new ThemeOption { Value = AppTheme.System, Name = LocalizationManager.Instance["ThemeSystem"] });
+            AvailableThemes.Add(new ThemeOption { Value = AppTheme.Light, Name = LocalizationManager.Instance["ThemeLight"] });
+            AvailableThemes.Add(new ThemeOption { Value = AppTheme.Dark, Name = LocalizationManager.Instance["ThemeDark"] });
         }
 
         private void OnTimerTick(object? sender, EventArgs e)
@@ -137,6 +161,7 @@ namespace LightsOut.ViewModels
 
         private void OnLanguageChanged(object? sender, EventArgs e)
         {
+            UpdateAvailableThemes();
             UpdateCountdown();
         }
 
@@ -176,6 +201,7 @@ namespace LightsOut.ViewModels
             SelectedLanguage = string.IsNullOrWhiteSpace(settings.Language)
                 ? LocalizationManager.Instance.CurrentLanguageCode
                 : settings.Language;
+            SelectedTheme = settings.Theme;
 
             ShutdownTimes.Clear();
             foreach (var time in settings.ShutdownTimes)
@@ -221,7 +247,8 @@ namespace LightsOut.ViewModels
                 IsActive = IsActive,
                 ShutdownTimes = ShutdownTimes.Select(CloneShutdownTime).ToList(),
                 IsStartupEnabled = IsStartupEnabled,
-                Language = SelectedLanguage
+                Language = SelectedLanguage,
+                Theme = SelectedTheme
             };
         }
 
@@ -265,6 +292,31 @@ namespace LightsOut.ViewModels
             LocalizationManager.Instance.SetLanguage(value);
             UpdateCountdown();
             QueueSettingsSave();
+        }
+
+        private void HandleSelectedThemeChanged(AppTheme value)
+        {
+            ApplyTheme(value);
+            QueueSettingsSave();
+        }
+
+        private void ApplyTheme(AppTheme theme)
+        {
+            var wpfuiTheme = theme switch
+            {
+                AppTheme.Light => Wpf.Ui.Appearance.ApplicationTheme.Light,
+                AppTheme.Dark => Wpf.Ui.Appearance.ApplicationTheme.Dark,
+                _ => Wpf.Ui.Appearance.ApplicationTheme.Unknown // Unknown triggers system sync in some contexts, but let's check WPF-UI docs
+            };
+
+            if (theme == AppTheme.System)
+            {
+                Wpf.Ui.Appearance.ApplicationThemeManager.ApplySystemTheme();
+            }
+            else
+            {
+                Wpf.Ui.Appearance.ApplicationThemeManager.Apply(wpfuiTheme);
+            }
         }
 
         private void AddTime()
