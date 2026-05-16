@@ -70,7 +70,3 @@ dotnet publish -c Release -r win-x64 --self-contained true -p:PublishTrimmed=fal
 - **Views**: 界面布局 (XAML)。
 - **Helpers**: 辅助工具类（如设置持久化服务）。
 - **Resources**: 多语言资源文件。
-
-## 许可证
-
-[MIT License](LICENSE)
