@@ -3,14 +3,14 @@
 
 [Setup]
 AppName=Lights Out
-AppVersion=1.1
+AppVersion=1.2
 AppPublisher=Lights Out
-AppVerName=Lights Out 1.1
+AppVerName=Lights Out 1.2
 DefaultDirName={commonpf}\LightsOut
 DefaultGroupName=Lights Out
 AllowNoIcons=yes
 OutputDir=.\Output
-OutputBaseFilename=LightsOut-Setup-1.1
+OutputBaseFilename=LightsOut-Setup-1.2
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
