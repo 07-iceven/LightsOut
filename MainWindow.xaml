@@ -14,6 +14,10 @@
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource ApplicationBackgroundBrush}">
 
+    <ui:FluentWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </ui:FluentWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,68 +28,46 @@
                      Title="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[AppTitle]}">
         </ui:TitleBar>
 
-        <Grid Grid.Row="1" Margin="24">
+        <Grid Grid.Row="1" Margin="20">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <StackPanel Grid.Row="0" Margin="0,8,0,16">
-                <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[AppTitle]}" 
-                           FontSize="28" 
-                           FontWeight="Bold" 
-                           HorizontalAlignment="Center"
-                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-            </StackPanel>
-
             <!-- Master Switch & Countdown -->
-            <StackPanel Grid.Row="1" Margin="0,0,0,20">
-                <ui:Card Padding="16" Margin="0,0,0,10">
-                    <Grid HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+            <ui:Card Grid.Row="0" Padding="16,16" Margin="0,0,0,16">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
                         <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[MainToggleLabel]}" 
-                                   FontSize="16" 
+                                   FontSize="18" 
                                    FontWeight="SemiBold" 
-                                   Margin="0,0,12,0"
                                    TextWrapping="Wrap"
-                                   VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                        <ui:ToggleSwitch Grid.Column="1"
-                                         IsChecked="{Binding IsActive}" 
-                                         HorizontalAlignment="Right"
-                                         VerticalAlignment="Center"
-                                         Margin="0"
-                                         Padding="0"
-                                         FocusVisualStyle="{x:Null}"/>
-                    </Grid>
-                </ui:Card>
-
-                <ui:Card Padding="20">
-                    <TextBlock Text="{Binding CountdownText}"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               HorizontalAlignment="Center"
-                               TextAlignment="Center"
-                               TextWrapping="Wrap"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                </ui:Card>
-            </StackPanel>
+                        <TextBlock Text="{Binding CountdownText}"
+                                   FontSize="14"
+                                   Margin="0,6,0,0"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding IsActive, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                    <ui:ToggleSwitch Grid.Column="1"
+                                     IsChecked="{Binding IsActive}" 
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Center"
+                                     Margin="0"
+                                     Padding="0"
+                                     FocusVisualStyle="{x:Null}"/>
+                </Grid>
+            </ui:Card>
 
             <!-- Multi-Time List -->
-            <Grid Grid.Row="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
+            <Grid Grid.Row="1">
                 <ListBox x:Name="TimeListBox"
-                         Grid.Row="0" 
                          ItemsSource="{Binding ShutdownTimes}"
                          Background="Transparent"
                          BorderThickness="0"
@@ -104,7 +86,7 @@
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Padding" Value="0"/>
-                            <Setter Property="Margin" Value="0,4"/>
+                            <Setter Property="Margin" Value="0,0,0,8"/>
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                             <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="Focusable" Value="False"/>
@@ -121,37 +103,45 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type models:ShutdownTime}">
-                            <ui:Card Padding="16,12" Margin="0,4">
+                            <ui:Card Padding="0">
                                 <Grid HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding DisplayTime}" 
-                                               FontSize="22" 
-                                               FontWeight="SemiBold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Left"
-                                               Margin="0,0,0,0"
-                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <!-- 覆盖整个卡片的透明按钮 -->
+                                    <Button Grid.Column="0" Grid.ColumnSpan="2"
+                                            Background="Transparent" 
+                                            BorderThickness="0" 
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Cursor="Hand"
+                                            Click="TimeItem_Click">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="Transparent"/>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
 
-                                    <ui:Button Grid.Column="2"
-                                               Appearance="Transparent"
-                                               VerticalAlignment="Center"
-                                               Padding="8"
-                                               Margin="0,0,10,0"
-                                               Command="{Binding DataContext.RemoveTimeCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                               CommandParameter="{Binding}"
-                                               Icon="{ui:SymbolIcon Symbol=Delete24}"/>
+                                    <!-- 时间与重复周期信息 -->
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="16,14,0,14" IsHitTestVisible="False">
+                                        <TextBlock Text="{Binding DisplayTime}" 
+                                                   FontSize="32" 
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="{Binding RepeatText, Mode=OneWay}"
+                                                   Margin="0,4,0,0"
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                   FontSize="13"/>
+                                    </StackPanel>
 
-                                    <ui:ToggleSwitch Grid.Column="3"
+                                    <ui:ToggleSwitch Grid.Column="1"
                                                      IsChecked="{Binding IsEnabled}" 
                                                      VerticalAlignment="Center"
                                                      HorizontalAlignment="Right"
-                                                     Margin="0"
+                                                     Margin="0,0,16,0"
                                                      Padding="0"
                                                      FocusVisualStyle="{x:Null}"/>
                                 </Grid>
@@ -160,117 +150,92 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <!-- Add New Time -->
-                <ui:Card Grid.Row="1" 
-                        Padding="12"
-                        Margin="0,10,0,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <StackPanel>
-                            <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[HourLabel]}" 
-                                       Margin="0,0,0,4" 
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"/>
-                            <ui:NumberBox Value="{Binding NewHour}" 
-                                          Minimum="0" Maximum="23"
-                                          SpinButtonPlacementMode="Inline"
-                                          FocusVisualStyle="{x:Null}"/>
-                        </StackPanel>
-                        
-                        <TextBlock Text=":" Grid.Column="1" VerticalAlignment="Bottom" Margin="8,0,8,8" FontSize="20" FontWeight="Bold"/>
-                        
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[MinuteLabel]}" 
-                                       Margin="0,0,0,4" 
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       FontSize="12"/>
-                            <ui:NumberBox Value="{Binding NewMinute}" 
-                                          Minimum="0" Maximum="59"
-                                          SpinButtonPlacementMode="Inline"
-                                          FocusVisualStyle="{x:Null}"/>
-                        </StackPanel>
-
-                        <ui:Button Grid.Column="3" 
-                                   Appearance="Primary"
-                                   Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[AddButton]}" 
-                                   Command="{Binding AddTimeCommand}"
-                                   VerticalAlignment="Bottom"
-                                   Margin="10,0,0,0"
-                                   FocusVisualStyle="{x:Null}"/>
-                    </Grid>
-                </ui:Card>
+                <!-- Add New Time Button (FAB) -->
+                <ui:Button Icon="{ui:SymbolIcon Symbol=Add24}" 
+                           Appearance="Primary"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Bottom"
+                           Margin="0,0,8,8"
+                           Width="56" Height="56"
+                           CornerRadius="28"
+                           Click="BtnAdd_Click">
+                    <ui:Button.Effect>
+                        <DropShadowEffect BlurRadius="8" Opacity="0.3" ShadowDepth="3" Direction="270" Color="Black"/>
+                    </ui:Button.Effect>
+                </ui:Button>
             </Grid>
 
             <!-- Footer / Settings -->
-            <ui:Card Grid.Row="3" 
-                    Padding="16"
-                    Margin="0,10,0,0">
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <ui:Card Grid.Row="2" 
+                     Padding="0"
+                     Margin="0,16,0,0">
+                <StackPanel>
+                    <!-- Startup -->
+                    <Grid Margin="16,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="Rocket24" Margin="0,0,12,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[StartupLabel]}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        </StackPanel>
+                        <ui:ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding IsStartupEnabled}" 
+                                         HorizontalAlignment="Right"
+                                         Margin="0" Padding="0"
+                                         FocusVisualStyle="{x:Null}"/>
+                    </Grid>
+                    
+                    <Border Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" Margin="16,0"/>
 
-                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <ui:SymbolIcon Symbol="Settings24" Margin="0,0,10,0"/>
-                    <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[StartupLabel]}"
-                               Margin="0,0,12,0"
-                               TextWrapping="Wrap"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                    <!-- Language -->
+                    <Grid Margin="16,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="LocalLanguage24" Margin="0,0,12,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[LanguageLabel]}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  MinWidth="120"
+                                  ItemsSource="{Binding AvailableLanguages}"
+                                  DisplayMemberPath="DisplayName"
+                                  SelectedValuePath="Code"
+                                  SelectedValue="{Binding SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  FocusVisualStyle="{x:Null}"/>
+                    </Grid>
+
+                    <Border Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" Margin="16,0"/>
+
+                    <!-- Theme -->
+                    <Grid Margin="16,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="Color24" Margin="0,0,12,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[ThemeLabel]}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  MinWidth="120"
+                                  ItemsSource="{Binding AvailableThemes}"
+                                  DisplayMemberPath="Name"
+                                  SelectedValuePath="Value"
+                                  SelectedValue="{Binding SelectedTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  FocusVisualStyle="{x:Null}"/>
+                    </Grid>
                 </StackPanel>
-                <ui:ToggleSwitch Grid.Row="0"
-                                 Grid.Column="1"
-                                 IsChecked="{Binding IsStartupEnabled}" 
-                                 HorizontalAlignment="Right"
-                                 Margin="0"
-                                 Padding="0"
-                                 FocusVisualStyle="{x:Null}"/>
-
-                <TextBlock Grid.Row="1"
-                           Grid.Column="0"
-                           Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[LanguageLabel]}"
-                           VerticalAlignment="Center"
-                           Margin="0,14,0,0"
-                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                <ComboBox Grid.Row="1"
-                          Grid.Column="1"
-                          MinWidth="120"
-                          Margin="0,10,0,0"
-                          ItemsSource="{Binding AvailableLanguages}"
-                          DisplayMemberPath="DisplayName"
-                          SelectedValuePath="Code"
-                          SelectedValue="{Binding SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          FocusVisualStyle="{x:Null}"/>
-
-                <TextBlock Grid.Row="2"
-                           Grid.Column="0"
-                           Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[ThemeLabel]}"
-                           VerticalAlignment="Center"
-                           Margin="0,14,0,0"
-                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                <ComboBox Grid.Row="2"
-                          Grid.Column="1"
-                          MinWidth="120"
-                          Margin="0,10,0,0"
-                          ItemsSource="{Binding AvailableThemes}"
-                          DisplayMemberPath="Name"
-                          SelectedValuePath="Value"
-                          SelectedValue="{Binding SelectedTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          FocusVisualStyle="{x:Null}"/>
-            </Grid>
-        </ui:Card>
+            </ui:Card>
         </Grid>
     </Grid>
 </ui:FluentWindow>

@@ -65,18 +65,6 @@ namespace LightsOut.ViewModels
 
         public ObservableCollection<ShutdownTime> ShutdownTimes { get; } = new();
 
-        public int NewHour
-        {
-            get => _newHour;
-            set => SetProperty(ref _newHour, value);
-        }
-
-        public int NewMinute
-        {
-            get => _newMinute;
-            set => SetProperty(ref _newMinute, value);
-        }
-
         public string SelectedLanguage
         {
             get => _selectedLanguage;
@@ -110,10 +98,6 @@ namespace LightsOut.ViewModels
 
         public ObservableCollection<ThemeOption> AvailableThemes { get; } = new();
 
-        public IRelayCommand AddTimeCommand { get; }
-
-        public IRelayCommand<ShutdownTime?> RemoveTimeCommand { get; }
-
         public MainViewModel(AppSettings? initialSettings = null)
         {
             _timer = new DispatcherTimer
@@ -127,9 +111,6 @@ namespace LightsOut.ViewModels
                 Interval = TimeSpan.FromMilliseconds(500)
             };
             _saveTimer.Tick += OnSaveTimerTick;
-
-            AddTimeCommand = new RelayCommand(AddTime);
-            RemoveTimeCommand = new RelayCommand<ShutdownTime?>(RemoveTime);
 
             LocalizationManager.Instance.LanguageChanged += OnLanguageChanged;
             ShutdownTimes.CollectionChanged += OnShutdownTimesCollectionChanged;
@@ -185,7 +166,15 @@ namespace LightsOut.ViewModels
         {
             if (e.PropertyName == nameof(ShutdownTime.IsEnabled) ||
                 e.PropertyName == nameof(ShutdownTime.Hour) ||
-                e.PropertyName == nameof(ShutdownTime.Minute))
+                e.PropertyName == nameof(ShutdownTime.Minute) ||
+                e.PropertyName == nameof(ShutdownTime.IsRepeat) ||
+                e.PropertyName == nameof(ShutdownTime.Monday) ||
+                e.PropertyName == nameof(ShutdownTime.Tuesday) ||
+                e.PropertyName == nameof(ShutdownTime.Wednesday) ||
+                e.PropertyName == nameof(ShutdownTime.Thursday) ||
+                e.PropertyName == nameof(ShutdownTime.Friday) ||
+                e.PropertyName == nameof(ShutdownTime.Saturday) ||
+                e.PropertyName == nameof(ShutdownTime.Sunday))
             {
                 UpdateNextShutdownTime();
             }
@@ -259,7 +248,14 @@ namespace LightsOut.ViewModels
                 Id = time.Id,
                 Hour = time.Hour,
                 Minute = time.Minute,
-                IsEnabled = time.IsEnabled
+                IsEnabled = time.IsEnabled,
+                Monday = time.Monday,
+                Tuesday = time.Tuesday,
+                Wednesday = time.Wednesday,
+                Thursday = time.Thursday,
+                Friday = time.Friday,
+                Saturday = time.Saturday,
+                Sunday = time.Sunday
             };
         }
 
@@ -319,17 +315,24 @@ namespace LightsOut.ViewModels
             }
         }
 
-        private void AddTime()
+        public void AddTime(ShutdownTime time)
         {
-            ShutdownTimes.Add(new ShutdownTime { Hour = NewHour, Minute = NewMinute });
+            ShutdownTimes.Add(time);
         }
 
-        private void RemoveTime(ShutdownTime? time)
+        public void RemoveTime(ShutdownTime? time)
         {
             if (time != null)
             {
                 ShutdownTimes.Remove(time);
             }
+        }
+
+        public void UpdateTime(ShutdownTime time)
+        {
+            // Force update next shutdown time and save
+            UpdateNextShutdownTime();
+            QueueSettingsSave();
         }
 
         public void UpdateNextShutdownTime()
@@ -346,11 +349,45 @@ namespace LightsOut.ViewModels
             foreach (var st in ShutdownTimes.Where(t => t.IsEnabled))
             {
                 var target = now.Date.AddHours(st.Hour).AddMinutes(st.Minute);
-                if (target <= now)
+                
+                if (!st.IsRepeat)
                 {
-                    target = target.AddDays(1);
+                    if (target <= now)
+                    {
+                        target = target.AddDays(1);
+                    }
+                    candidates.Add(target);
                 }
-                candidates.Add(target);
+                else
+                {
+                    // Find the next available day
+                    for (int i = 0; i <= 7; i++)
+                    {
+                        var checkDate = target.AddDays(i);
+                        if (i == 0 && checkDate <= now)
+                        {
+                            continue;
+                        }
+
+                        bool isDayEnabled = checkDate.DayOfWeek switch
+                        {
+                            DayOfWeek.Monday => st.Monday,
+                            DayOfWeek.Tuesday => st.Tuesday,
+                            DayOfWeek.Wednesday => st.Wednesday,
+                            DayOfWeek.Thursday => st.Thursday,
+                            DayOfWeek.Friday => st.Friday,
+                            DayOfWeek.Saturday => st.Saturday,
+                            DayOfWeek.Sunday => st.Sunday,
+                            _ => false
+                        };
+
+                        if (isDayEnabled)
+                        {
+                            candidates.Add(checkDate);
+                            break;
+                        }
+                    }
+                }
             }
 
             if (candidates.Any())
@@ -385,6 +422,18 @@ namespace LightsOut.ViewModels
             {
                 Debug.WriteLine("[Lights Out] !!! 触发关机预警 !!!");
                 
+                // Disable single-use alarms that just triggered
+                if (_nextShutdownDateTime.HasValue)
+                {
+                    foreach (var st in ShutdownTimes.Where(t => t.IsEnabled && !t.IsRepeat))
+                    {
+                        if (st.Hour == _nextShutdownDateTime.Value.Hour && st.Minute == _nextShutdownDateTime.Value.Minute)
+                        {
+                            st.IsEnabled = false;
+                        }
+                    }
+                }
+
                 // 立即计算下一个时间点
                 UpdateNextShutdownTime();
 

@@ -52,7 +52,7 @@
     <value>Lights Out - 自动关机工具</value>
   </data>
   <data name="TrayShowMainWindow" xml:space="preserve">
-    <value>显示主界面</value>
+    <value>设置</value>
   </data>
   <data name="TrayExit" xml:space="preserve">
     <value>完全退出</value>
@@ -74,5 +74,62 @@
   </data>
   <data name="ThemeSystem" xml:space="preserve">
     <value>跟随系统</value>
+  </data>
+  <data name="RepeatLabel" xml:space="preserve">
+    <value>循环</value>
+  </data>
+  <data name="RepeatOnce" xml:space="preserve">
+    <value>只响一次</value>
+  </data>
+  <data name="RepeatEveryday" xml:space="preserve">
+    <value>每天</value>
+  </data>
+  <data name="RepeatWorkdays" xml:space="preserve">
+    <value>周一至周五</value>
+  </data>
+  <data name="RepeatNotSet" xml:space="preserve">
+    <value>未设置</value>
+  </data>
+  <data name="Day1" xml:space="preserve">
+    <value>周一</value>
+  </data>
+  <data name="Day2" xml:space="preserve">
+    <value>周二</value>
+  </data>
+  <data name="Day3" xml:space="preserve">
+    <value>周三</value>
+  </data>
+  <data name="Day4" xml:space="preserve">
+    <value>周四</value>
+  </data>
+  <data name="Day5" xml:space="preserve">
+    <value>周五</value>
+  </data>
+  <data name="Day6" xml:space="preserve">
+    <value>周六</value>
+  </data>
+  <data name="Day7" xml:space="preserve">
+    <value>周日</value>
+  </data>
+  <data name="Day1Short" xml:space="preserve">
+    <value>一</value>
+  </data>
+  <data name="Day2Short" xml:space="preserve">
+    <value>二</value>
+  </data>
+  <data name="Day3Short" xml:space="preserve">
+    <value>三</value>
+  </data>
+  <data name="Day4Short" xml:space="preserve">
+    <value>四</value>
+  </data>
+  <data name="Day5Short" xml:space="preserve">
+    <value>五</value>
+  </data>
+  <data name="Day6Short" xml:space="preserve">
+    <value>六</value>
+  </data>
+  <data name="Day7Short" xml:space="preserve">
+    <value>日</value>
   </data>
 </root>

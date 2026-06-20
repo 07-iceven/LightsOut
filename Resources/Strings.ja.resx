@@ -52,7 +52,7 @@
     <value>Lights Out - 自動シャットダウンツール</value>
   </data>
   <data name="TrayShowMainWindow" xml:space="preserve">
-    <value>メイン画面を表示</value>
+    <value>設定</value>
   </data>
   <data name="TrayExit" xml:space="preserve">
     <value>完全に終了</value>
@@ -74,5 +74,62 @@
   </data>
   <data name="ThemeSystem" xml:space="preserve">
     <value>システムに従う</value>
+  </data>
+  <data name="RepeatLabel" xml:space="preserve">
+    <value>繰り返し</value>
+  </data>
+  <data name="RepeatOnce" xml:space="preserve">
+    <value>1回のみ</value>
+  </data>
+  <data name="RepeatEveryday" xml:space="preserve">
+    <value>毎日</value>
+  </data>
+  <data name="RepeatWorkdays" xml:space="preserve">
+    <value>月-金</value>
+  </data>
+  <data name="RepeatNotSet" xml:space="preserve">
+    <value>未設定</value>
+  </data>
+  <data name="Day1" xml:space="preserve">
+    <value>月</value>
+  </data>
+  <data name="Day2" xml:space="preserve">
+    <value>火</value>
+  </data>
+  <data name="Day3" xml:space="preserve">
+    <value>水</value>
+  </data>
+  <data name="Day4" xml:space="preserve">
+    <value>木</value>
+  </data>
+  <data name="Day5" xml:space="preserve">
+    <value>金</value>
+  </data>
+  <data name="Day6" xml:space="preserve">
+    <value>土</value>
+  </data>
+  <data name="Day7" xml:space="preserve">
+    <value>日</value>
+  </data>
+  <data name="Day1Short" xml:space="preserve">
+    <value>月</value>
+  </data>
+  <data name="Day2Short" xml:space="preserve">
+    <value>火</value>
+  </data>
+  <data name="Day3Short" xml:space="preserve">
+    <value>水</value>
+  </data>
+  <data name="Day4Short" xml:space="preserve">
+    <value>木</value>
+  </data>
+  <data name="Day5Short" xml:space="preserve">
+    <value>金</value>
+  </data>
+  <data name="Day6Short" xml:space="preserve">
+    <value>土</value>
+  </data>
+  <data name="Day7Short" xml:space="preserve">
+    <value>日</value>
   </data>
 </root>

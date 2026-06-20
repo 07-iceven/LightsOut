@@ -52,7 +52,7 @@
     <value>Lights Out - Auto Shutdown Tool</value>
   </data>
   <data name="TrayShowMainWindow" xml:space="preserve">
-    <value>Show Main Window</value>
+    <value>Settings</value>
   </data>
   <data name="TrayExit" xml:space="preserve">
     <value>Exit completely</value>
@@ -74,5 +74,62 @@
   </data>
   <data name="ThemeSystem" xml:space="preserve">
     <value>System</value>
+  </data>
+  <data name="RepeatLabel" xml:space="preserve">
+    <value>Repeat</value>
+  </data>
+  <data name="RepeatOnce" xml:space="preserve">
+    <value>Once</value>
+  </data>
+  <data name="RepeatEveryday" xml:space="preserve">
+    <value>Everyday</value>
+  </data>
+  <data name="RepeatWorkdays" xml:space="preserve">
+    <value>Mon-Fri</value>
+  </data>
+  <data name="RepeatNotSet" xml:space="preserve">
+    <value>Not set</value>
+  </data>
+  <data name="Day1" xml:space="preserve">
+    <value>Mon</value>
+  </data>
+  <data name="Day2" xml:space="preserve">
+    <value>Tue</value>
+  </data>
+  <data name="Day3" xml:space="preserve">
+    <value>Wed</value>
+  </data>
+  <data name="Day4" xml:space="preserve">
+    <value>Thu</value>
+  </data>
+  <data name="Day5" xml:space="preserve">
+    <value>Fri</value>
+  </data>
+  <data name="Day6" xml:space="preserve">
+    <value>Sat</value>
+  </data>
+  <data name="Day7" xml:space="preserve">
+    <value>Sun</value>
+  </data>
+  <data name="Day1Short" xml:space="preserve">
+    <value>M</value>
+  </data>
+  <data name="Day2Short" xml:space="preserve">
+    <value>T</value>
+  </data>
+  <data name="Day3Short" xml:space="preserve">
+    <value>W</value>
+  </data>
+  <data name="Day4Short" xml:space="preserve">
+    <value>T</value>
+  </data>
+  <data name="Day5Short" xml:space="preserve">
+    <value>F</value>
+  </data>
+  <data name="Day6Short" xml:space="preserve">
+    <value>S</value>
+  </data>
+  <data name="Day7Short" xml:space="preserve">
+    <value>S</value>
   </data>
 </root>

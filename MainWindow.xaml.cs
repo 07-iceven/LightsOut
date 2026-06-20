@@ -1,4 +1,5 @@
 using System.Windows;
+using LightsOut.Models;
 using LightsOut.ViewModels;
 using LightsOut.Views;
 using CommunityToolkit.Mvvm.Messaging;
@@ -46,6 +47,42 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         if (Environment.GetCommandLineArgs().Contains("--minimized"))
         {
             Hide();
+        }
+    }
+
+    private void BtnAdd_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new EditTimeWindow
+        {
+            Owner = this
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            ViewModel.AddTime(dialog.Time);
+        }
+    }
+
+    private void TimeItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is ShutdownTime time)
+        {
+            var dialog = new EditTimeWindow(time)
+            {
+                Owner = this
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.IsDeleted)
+                {
+                    ViewModel.RemoveTime(time);
+                }
+                else
+                {
+                    ViewModel.UpdateTime(time);
+                }
+            }
         }
     }
 
