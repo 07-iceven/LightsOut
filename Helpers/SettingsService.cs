@@ -115,7 +115,14 @@ namespace LightsOut.Helpers
                         Id = time.Id,
                         Hour = time.Hour,
                         Minute = time.Minute,
-                        IsEnabled = time.IsEnabled
+                        IsEnabled = time.IsEnabled,
+                        Monday = time.Monday,
+                        Tuesday = time.Tuesday,
+                        Wednesday = time.Wednesday,
+                        Thursday = time.Thursday,
+                        Friday = time.Friday,
+                        Saturday = time.Saturday,
+                        Sunday = time.Sunday
                     })
                     .ToList()
             };

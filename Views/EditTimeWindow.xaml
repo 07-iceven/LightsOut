@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:helpers="clr-namespace:LightsOut.Helpers"
-        Title="设置时间" Height="450" Width="350"
+        Title="设置时间" Height="520" Width="350"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource ApplicationBackgroundBrush}">
     <Grid Margin="24">
@@ -36,28 +36,83 @@
                 </Grid>
             </ui:Card>
             
-            <!-- Repeat Card -->
-            <ui:Card Padding="20">
+            <!-- Repeat Card (phone-alarm style) -->
+            <ui:Card Padding="0" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[RepeatLabel]}" Margin="0,0,0,16" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                    <UniformGrid Rows="1" Columns="7" HorizontalAlignment="Stretch">
-                        <UniformGrid.Resources>
-                            <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                                <Setter Property="Margin" Value="4"/>
-                                <Setter Property="Width" Value="36"/>
-                                <Setter Property="Height" Value="36"/>
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="FontSize" Value="14"/>
-                            </Style>
-                        </UniformGrid.Resources>
-                        <ToggleButton x:Name="BtnMon" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day1Short]}"/>
-                        <ToggleButton x:Name="BtnTue" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day2Short]}"/>
-                        <ToggleButton x:Name="BtnWed" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day3Short]}"/>
-                        <ToggleButton x:Name="BtnThu" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day4Short]}"/>
-                        <ToggleButton x:Name="BtnFri" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day5Short]}"/>
-                        <ToggleButton x:Name="BtnSat" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day6Short]}"/>
-                        <ToggleButton x:Name="BtnSun" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day7Short]}"/>
-                    </UniformGrid>
+                    <!-- 摘要行：点击展开/收起星期选择器 -->
+                    <Button x:Name="BtnRepeatRow"
+                            Click="OnRepeatRowClick"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            HorizontalAlignment="Stretch"
+                            IsTabStop="False">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Grid Margin="20,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[RepeatLabel]}"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock x:Name="RepeatSummaryText"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"
+                                       TextTrimming="CharacterEllipsis"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            <ui:SymbolIcon x:Name="RepeatChevronIcon"
+                                           Grid.Column="2"
+                                           Symbol="ChevronRight24"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                        </Grid>
+                    </Button>
+
+                    <!-- 展开后的选择面板 -->
+                    <StackPanel x:Name="RepeatPickerPanel" Margin="20,4,20,20" Visibility="Collapsed">
+                        <!-- 快捷预设 -->
+                        <UniformGrid Rows="1" Columns="3" HorizontalAlignment="Stretch">
+                            <UniformGrid.Resources>
+                                <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                    <Setter Property="Margin" Value="4"/>
+                                    <Setter Property="Padding" Value="0,6"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </UniformGrid.Resources>
+                            <ToggleButton x:Name="BtnPresetOnce" Click="OnPresetClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[RepeatOnce]}"/>
+                            <ToggleButton x:Name="BtnPresetWorkdays" Click="OnPresetClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[RepeatWorkdays]}"/>
+                            <ToggleButton x:Name="BtnPresetEveryday" Click="OnPresetClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[RepeatEveryday]}"/>
+                        </UniformGrid>
+
+                        <!-- 自定义星期多选 -->
+                        <UniformGrid Rows="1" Columns="7" HorizontalAlignment="Stretch" Margin="0,8,0,0">
+                            <UniformGrid.Resources>
+                                <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                    <Setter Property="Margin" Value="4"/>
+                                    <Setter Property="Width" Value="36"/>
+                                    <Setter Property="Height" Value="36"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                            </UniformGrid.Resources>
+                            <ToggleButton x:Name="BtnMon" Click="OnDayButtonClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day1Short]}"/>
+                            <ToggleButton x:Name="BtnTue" Click="OnDayButtonClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day2Short]}"/>
+                            <ToggleButton x:Name="BtnWed" Click="OnDayButtonClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day3Short]}"/>
+                            <ToggleButton x:Name="BtnThu" Click="OnDayButtonClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day4Short]}"/>
+                            <ToggleButton x:Name="BtnFri" Click="OnDayButtonClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day5Short]}"/>
+                            <ToggleButton x:Name="BtnSat" Click="OnDayButtonClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day6Short]}"/>
+                            <ToggleButton x:Name="BtnSun" Click="OnDayButtonClick" Content="{Binding Source={x:Static helpers:LocalizationManager.Instance}, Path=[Day7Short]}"/>
+                        </UniformGrid>
+                    </StackPanel>
                 </StackPanel>
             </ui:Card>
         </StackPanel>
