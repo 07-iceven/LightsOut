@@ -27,6 +27,9 @@
   <data name="CountdownFormat" xml:space="preserve">
     <value>次回シャットダウン: {0:D2}時 {1:D2}分 {2:D2}秒</value>
   </data>
+  <data name="CountdownFormatDays" xml:space="preserve">
+    <value>次回シャットダウン: {0}日 {1:D2}時間 {2:D2}分 {3:D2}秒</value>
+  </data>
   <data name="HourLabel" xml:space="preserve">
     <value>時</value>
   </data>

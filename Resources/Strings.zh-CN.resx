@@ -27,6 +27,9 @@
   <data name="CountdownFormat" xml:space="preserve">
     <value>下次关机: {0:D2}时 {1:D2}分 {2:D2}秒</value>
   </data>
+  <data name="CountdownFormatDays" xml:space="preserve">
+    <value>下次关机: {0}天 {1:D2}时 {2:D2}分 {3:D2}秒</value>
+  </data>
   <data name="HourLabel" xml:space="preserve">
     <value>时</value>
   </data>

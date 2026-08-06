@@ -441,11 +441,23 @@ namespace LightsOut.ViewModels
                 return;
             }
 
-            CountdownText = LocalizationManager.Instance.Format(
-                "CountdownFormat",
-                remaining.Hours,
-                remaining.Minutes,
-                remaining.Seconds);
+            if (remaining.TotalDays >= 1)
+            {
+                CountdownText = LocalizationManager.Instance.Format(
+                    "CountdownFormatDays",
+                    (int)remaining.TotalDays,
+                    remaining.Hours,
+                    remaining.Minutes,
+                    remaining.Seconds);
+            }
+            else
+            {
+                CountdownText = LocalizationManager.Instance.Format(
+                    "CountdownFormat",
+                    remaining.Hours,
+                    remaining.Minutes,
+                    remaining.Seconds);
+            }
         }
 
         private void CancelSystemShutdown()
